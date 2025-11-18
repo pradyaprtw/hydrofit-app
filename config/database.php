@@ -75,7 +75,8 @@ return [
             'prefix' => '',
             'prefix_indexes' => true,
             'search_path' => 'public',
-            'sslmode' => 'prefer',
+            // MODIFIKASI DI SINI: Trik biar laptop Windows bisa baca Neon
+            'sslmode' => 'require' . (str_contains(env('DB_HOST'), 'neon.tech') ? ';options=endpoint='.explode('.', env('DB_HOST'))[0] : ''),
         ],
 
         'sqlsrv' => [

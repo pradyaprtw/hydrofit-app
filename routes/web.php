@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\WaterIntakeController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Artisan;
 
 // 1. Halaman Depan (Redirect ke Login)
 Route::get('/', function () {
@@ -34,6 +35,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Route Halaman Tentang Aplikasi
     Route::get('/about', [WaterIntakeController::class, 'about'])->name('about');   
+
+    // Route Rahasia untuk Migrate dari Vercel
+Route::get('/tembak-database', function () {
+    try {
+        // Jalankan perintah migrate:fresh --force
+        Artisan::call('migrate:fresh --force');
+        return '<h1>BERHASIL! Database sudah di-reset dan diisi. ✅</h1>';
+    } catch (\Exception $e) {
+        return '<h1>GAGAL!</h1><br>' . $e->getMessage();
+    }
+});
 
     // --- PROFILE BAWAAN BREEZE ---
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
