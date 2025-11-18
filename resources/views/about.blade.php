@@ -36,7 +36,7 @@
             {{-- Pembuat --}}
             <div class="mb-4">
                 <h3 class="font-bold text-black text-sm">Pembuat:</h3>
-                <p class="text-gray-600 text-sm">hai</p> {{-- Ganti Nama Kamu --}}
+                <p class="text-gray-600 text-sm">Azzahra Fadhilla Amelia (2258011043)</p> {{-- Ganti Nama Kamu --}}
             </div>
 
             {{-- Sumber --}}
