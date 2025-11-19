@@ -3,24 +3,53 @@
 <x-app-layout>
     <x-slot name="header"></x-slot>
 
+    {{-- 1. STRUKTUR SIDEBAR (Tambahan) --}}
+    <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden transition-opacity duration-300"></div>
+    <div id="sidebar-drawer" class="fixed inset-y-0 left-0 w-64 bg-white z-50 transform -translate-x-full transition-transform duration-300 ease-in-out shadow-2xl flex flex-col justify-between">
+        {{-- Konten Sidebar (Tentang Aplikasi & Logout) --}}
+        <div class="p-6">
+            <div class="flex items-center justify-between mb-8">
+                <div class="flex items-center text-blue-600 font-bold text-xl">
+                    <span class="text-2xl mr-2">💧</span> HydroFit
+                </div>
+                <button onclick="toggleSidebar()" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <nav>
+                <a href="{{ route('about') }}" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg transition font-medium">
+                    <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    Tentang Aplikasi
+                </a>
+            </nav>
+        </div>
+        <div class="p-6 border-t border-gray-100">
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit" class="w-full py-3 border border-gray-300 rounded-lg text-gray-700 font-bold hover:bg-gray-50 transition">
+                    Sign Out
+                </button>
+            </form>
+            <div class="mt-4 flex items-center justify-center bg-black text-white text-xs py-1 px-3 rounded-full w-max mx-auto">
+                 ✨ Made with Laravel
+            </div>
+        </div>
+    </div>
+    {{-- END SIDEBAR STRUKTUR --}}
+
     <div class="min-h-screen bg-white pb-24 font-sans">
         
-        {{-- APP BAR --}}
+        {{-- APP BAR (Diubah jadi Sidebar Trigger) --}}
         <div class="flex items-center px-4 py-4 bg-white sticky top-0 z-10 shadow-sm">
-             <button onclick="window.history.back()" class="text-gray-500 mr-4">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+            <button onclick="toggleSidebar()" class="text-gray-500 mr-4"> {{-- <--- PERBAIKAN DI SINI --}}
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
             </button>
             <h1 class="text-lg font-bold text-gray-800 text-center flex-1 mr-8">Progress</h1>
         </div>
 
-        {{-- KONTEN UTAMA --}}
+        {{-- KONTEN UTAMA (Sama seperti sebelumnya) --}}
         <div class="px-6 mt-4">
-            
-            <h2 class="text-xl font-bold text-gray-900 text-center mb-6">
-                Progress Minum Mingguan
-            </h2>
-
-            {{-- TABEL DATA --}}
+            <h2 class="text-xl font-bold text-gray-900 text-center mb-6">Progress Minum Mingguan</h2>
             <div class="overflow-hidden rounded-lg border border-gray-200 shadow-sm">
                 <table class="w-full text-sm text-left text-gray-500">
                     <thead class="text-xs text-gray-700 uppercase bg-gray-50 border-b">
@@ -33,17 +62,8 @@
                     <tbody class="divide-y divide-gray-100">
                         @foreach($weeklyData as $data)
                         <tr class="bg-white hover:bg-gray-50">
-                            {{-- Hari --}}
-                            <td class="px-4 py-4 font-medium text-gray-900">
-                                {{ $data['day'] }}
-                            </td>
-                            
-                            {{-- Jumlah Gelas --}}
-                            <td class="px-4 py-4 text-center font-bold text-gray-700">
-                                {{ $data['glasses'] }}
-                            </td>
-                            
-                            {{-- Status (Dengan Warna) --}}
+                            <td class="px-4 py-4 font-medium text-gray-900">{{ $data['day'] }}</td>
+                            <td class="px-4 py-4 text-center font-bold text-gray-700">{{ $data['glasses'] }}</td>
                             <td class="px-4 py-4 text-right">
                                 <span class="px-2 py-1 rounded-full text-xs font-bold {{ $data['color'] }}">
                                     {{ $data['status'] }}
@@ -54,11 +74,7 @@
                     </tbody>
                 </table>
             </div>
-            
-            <p class="text-xs text-gray-400 mt-4 text-center italic">
-                *Data direset setiap hari Senin
-            </p>
-
+            <p class="text-xs text-gray-400 mt-4 text-center italic">*Data direset setiap hari Senin</p>
         </div>
 
         {{-- BOTTOM NAV --}}
@@ -85,6 +101,22 @@
                 <span class="text-[10px] mt-1 font-bold">Progress</span>
             </div>
         </div>
-
     </div>
+    
+    {{-- LOGIKA JAVASCRIPT (FUNGSI SIDEBAR) --}}
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar-drawer');
+            const overlay = document.getElementById('sidebar-overlay');
+            
+            if (sidebar.classList.contains('-translate-x-full')) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            }
+        }
+    </script>
+
 </x-app-layout>

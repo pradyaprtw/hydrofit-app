@@ -1,14 +1,46 @@
 <script src="https://cdn.tailwindcss.com"></script>
 
 <x-app-layout>
-    <x-slot name="header">
-    </x-slot>
+    <x-slot name="header"></x-slot>
 
+    {{-- 1. STRUKTUR SIDEBAR (Copy dari Dashboard) --}}
+    <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden transition-opacity duration-300"></div>
+    <div id="sidebar-drawer" class="fixed inset-y-0 left-0 w-64 bg-white z-50 transform -translate-x-full transition-transform duration-300 ease-in-out shadow-2xl flex flex-col justify-between">
+        <div class="p-6">
+            <div class="flex items-center justify-between mb-8">
+                <div class="flex items-center text-blue-600 font-bold text-xl">
+                    <span class="text-2xl mr-2">💧</span> Hydro
+                </div>
+                <button onclick="toggleSidebar()" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <nav>
+                <a href="{{ route('about') }}" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg transition font-medium">
+                    <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    Tentang Aplikasi
+                </a>
+            </nav>
+        </div>
+        <div class="p-6 border-t border-gray-100">
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit" class="w-full py-3 border border-gray-300 rounded-lg text-gray-700 font-bold hover:bg-gray-50 transition">
+                    Sign Out
+                </button>
+            </form>
+            <div class="mt-4 flex items-center justify-center bg-black text-white text-xs py-1 px-3 rounded-full w-max mx-auto">
+                 ✨ Made with Laravel
+            </div>
+        </div>
+    </div>
+    {{-- END SIDEBAR STRUKTUR --}}
+    
     <div class="min-h-screen bg-white pb-24 font-sans"> 
         
         {{-- 1. APP BAR --}}
         <div class="flex items-center justify-between px-4 py-4 bg-white sticky top-0 z-10">
-            <button onclick="window.history.back()" class="text-gray-500">
+            <button onclick="toggleSidebar()" class="text-gray-500"> {{-- <--- PERBAIKAN: Ganti window.history.back() jadi toggleSidebar() --}}
                 <svg style="width: 24px; height: 24px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
                 </svg>
@@ -24,33 +56,28 @@
             <h2 class="text-xl font-bold text-center text-gray-900 mb-8">
                 Hitung Kebutuhan Cairan Harianmu
             </h2>
-
             {{-- Input Berat Badan --}}
             <div class="mb-6">
                 <label class="block text-sm font-bold text-gray-900 mb-2">Berat Badan (kg)</label>
                 <input type="number" id="weight" oninput="calculateWater()" placeholder="Masukkan berat badan" 
                     class="w-full bg-gray-100 border-none rounded-lg py-3 px-4 text-gray-700 focus:ring-2 focus:ring-blue-400">
             </div>
-
             {{-- Input Durasi Latihan --}}
             <div class="mb-8">
                 <label class="block text-sm font-bold text-gray-900 mb-2">Durasi Latihan (menit)</label>
                 <input type="number" id="exercise" oninput="calculateWater()" placeholder="Masukkan durasi latihan" 
                     class="w-full bg-gray-100 border-none rounded-lg py-3 px-4 text-gray-700 focus:ring-2 focus:ring-blue-400">
             </div>
-
             {{-- Hasil Perhitungan --}}
             <div class="text-center mb-2">
                 <p class="text-lg font-bold text-gray-900">
                     Kamu butuh sekitar <span id="result-ml" class="text-[#40B7D5] text-2xl">0</span> mL air per hari.
                 </p>
             </div>
-
             {{-- Sub Text --}}
             <p class="text-center text-gray-400 text-sm mb-8">
                 Minum 1 gelas air (200mL) setiap 2 jam agar cukup.
             </p>
-
             {{-- Tombol Simpan --}}
             <button onclick="saveTarget()" class="w-full flex items-center justify-center py-3 text-white rounded-lg shadow-md transition transform active:scale-95" style="background-color: #40B7D5;">
                 <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -58,10 +85,9 @@
                 </svg>
                 <span class="font-bold text-lg">Simpan Target Harian</span>
             </button>
-
         </div>
 
-        {{-- 3. BOTTOM NAVIGATION BAR --}}
+
         <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-2 flex justify-between items-center z-50">
             
             {{-- Dashboard (Abu) --}}
@@ -77,7 +103,7 @@
                 <svg style="width: 24px; height: 24px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
                 </svg>
-                <span class="text-[10px] mt-1 font-bold">Hitung Kebut...</span>
+                <span class="text-[10px] mt-1 font-bold">Hitung</span>
             </div>
 
             {{-- Pengingat --}}
@@ -105,36 +131,46 @@
             </a>
 
         </div>
-
     </div>
 
-// LOGIKA PERHITUNGAN VIA JAVASCRIPT
+    {{-- LOGIKA JAVASCRIPT (TERMASUK SIDEBAR FUNCTION) --}}
     <script>
+        // === FUNGSI SIDEBAR ===
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar-drawer');
+            const overlay = document.getElementById('sidebar-overlay');
+            
+            if (sidebar.classList.contains('-translate-x-full')) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            }
+        }
+        
+        // === LOGIKA PERHITUNGAN ===
         let finalTarget = 0;
 
         function calculateWater() {
             let weight = document.getElementById('weight').value;
             let exercise = document.getElementById('exercise').value;
-
-            // Pastikan input berupa angka
             weight = weight ? parseFloat(weight) : 0;
             exercise = exercise ? parseFloat(exercise) : 0;
 
-            // RUMUS FINAL: (Berat Badan x 35) + (Durasi Latihan x 10)
             let result = (weight * 35) + (exercise * 10);
-            
             finalTarget = Math.round(result); 
             
             document.getElementById('result-ml').innerText = finalTarget;
         }
 
+        // === LOGIKA SIMPAN (Tetap sama) ===
         function saveTarget() {
             if (finalTarget === 0) {
                 alert("Isi data dulu ya!");
                 return;
             }
             
-            // Kirim ke backend (sudah dimodifikasi jadi demo aman)
             fetch("{{ route('save.target') }}", {
                 method: "POST",
                 headers: {
@@ -144,17 +180,16 @@
                 body: JSON.stringify({ target: finalTarget })
             })
             .then(response => {
-                if (response.ok || response.status === 400) { // Cek status 200 atau 400 (jika validasi)
+                if (response.ok || response.status === 400) { 
                     alert("Target berhasil disimpan! Semangat minum airnya ya! 🌊");
-                    window.location.href = "{{ route('dashboard') }}";
+                    window.location.href = "{{ route('dashboard') }}"; 
                 } else {
-                    // Jika ada error server lain, tetap tampilkan error
                     return response.json().then(err => { throw new Error(err.message || "Server error."); });
                 }
             })
             .catch(error => {
-                 alert("Target berhasil disimpan (Mode Demo)! Pindah ke Dashboard.");
-                 window.location.href = "{{ route('dashboard') }}";
+                alert("Target berhasil disimpan (Mode Demo)! Pindah ke Dashboard.");
+                window.location.href = "{{ route('dashboard') }}";
             });
         }
     </script>

@@ -3,13 +3,48 @@
 <x-app-layout>
     <x-slot name="header"></x-slot>
 
+    {{-- 1. STRUKTUR SIDEBAR (Wajib Ada) --}}
+    <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden transition-opacity duration-300"></div>
+    <div id="sidebar-drawer" class="fixed inset-y-0 left-0 w-64 bg-white z-50 transform -translate-x-full transition-transform duration-300 ease-in-out shadow-2xl flex flex-col justify-between">
+        <div class="p-6">
+            <div class="flex items-center justify-between mb-8">
+                <div class="flex items-center text-blue-600 font-bold text-xl">
+                    <span class="text-2xl mr-2">💧</span> HydroFit
+                </div>
+                <button onclick="toggleSidebar()" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <nav>
+                <a href="{{ route('about') }}" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg transition font-medium">
+                    <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    Tentang Aplikasi
+                </a>
+            </nav>
+        </div>
+        <div class="p-6 border-t border-gray-100">
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit" class="w-full py-3 border border-gray-300 rounded-lg text-gray-700 font-bold hover:bg-gray-50 transition">
+                    Sign Out
+                </button>
+            </form>
+            <div class="mt-4 flex items-center justify-center bg-black text-white text-xs py-1 px-3 rounded-full w-max mx-auto">
+                 ✨ Made with Laravel
+            </div>
+        </div>
+    </div>
+    {{-- END SIDEBAR --}}
+
     <div class="min-h-screen bg-white pb-24 font-sans">
         
         {{-- APP BAR --}}
         <div class="flex items-center px-4 py-4 bg-white sticky top-0 z-10">
-            <button class="text-gray-500 mr-4">
+            {{-- Tombol Sidebar --}}
+            <button onclick="toggleSidebar()" class="text-gray-500 mr-4"> {{-- <--- FIX: Tambah onclick --}}
                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
             </button>
+             
              {{-- Search Bar --}}
             <form action="{{ route('education.index') }}" method="GET" class="flex-1">
                 <div class="relative">
@@ -28,9 +63,10 @@
                 
                 @forelse($articles as $item)
                 <a href="{{ route('education.show', $item['id']) }}" class="bg-gray-50 rounded-xl shadow-sm overflow-hidden border border-gray-100 active:scale-95 transition transform">
-                    {{-- Gambar (Placeholder kalau user belum ganti) --}}
+                    {{-- Gambar --}}
                     <div class="h-32 w-full bg-blue-100 flex items-center justify-center overflow-hidden">
-                        <img src="{{ asset($item['image']) }}" alt="{{ $item['title'] }}" class="w-full h-full object-cover">                    </div>
+                        <img src="{{ asset($item['image']) }}" alt="{{ $item['title'] }}" class="w-full h-full object-cover">
+                    </div>
                     {{-- Judul --}}
                     <div class="p-3">
                         <h3 class="font-bold text-gray-800 text-sm leading-snug">{{ $item['title'] }}</h3>
@@ -70,4 +106,20 @@
             </a>
         </div>
     </div>
+
+    {{-- SCRIPT SIDEBAR --}}
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar-drawer');
+            const overlay = document.getElementById('sidebar-overlay');
+            
+            if (sidebar.classList.contains('-translate-x-full')) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            }
+        }
+    </script>
 </x-app-layout>
