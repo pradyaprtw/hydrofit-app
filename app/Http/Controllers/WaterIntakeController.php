@@ -24,12 +24,21 @@ class WaterIntakeController extends Controller
         return view('dashboard', compact('consumedGlasses'));
     }
 
-    public function update(Request $request)
+public function update(Request $request)
     {
         $user = Auth::user();
+        
+        // === SAFETY CHECK: Kalau sesi hilang, tolak request ===
+        if (!$user) {
+            // Ini akan memaksa browser menangani error dan mungkin meminta login ulang
+            return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
+        }
+        // ======================================================
+        
         $today = Carbon::today();
         $glasses = $request->glasses;
 
+        // Proses update (Hanya jalan kalau sesi aman)
         DailyIntake::updateOrCreate(
             ['user_id' => $user->id, 'date' => $today],
             [

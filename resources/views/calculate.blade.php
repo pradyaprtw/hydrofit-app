@@ -122,7 +122,7 @@
             weight = weight ? parseInt(weight) : 0;
             exercise = exercise ? parseInt(exercise) : 0;
 
-            let result = (weight * 30) + ((exercise / 30) * 300);
+            let result = (weight * 35) + ((exercise / 10);
             
             finalTarget = Math.round(result); // Bulatkan
             
