@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 class EducationController extends Controller
 {
     // DATA DUMMY (Ganti Text/Gambar di sini aja)
-    private $articles = [
+    public $articles = [
         [
             'id' => 1,
             'title' => 'Kenapa Minum Air Penting?',
