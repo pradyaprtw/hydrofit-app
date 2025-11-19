@@ -13,8 +13,7 @@
             </button>
             
             {{-- Gambar --}}
-            <img src="{{ asset($article['image']) }}" alt="{{ $article['title'] }}" class="w-full h-full object-cover">
-        </div>
+            <img src="{{ asset($article['image']) }}" alt="{{ $article['title'] }}" class="w-full h-full object-cover">        </div>
 
         {{-- KONTEN TEKS --}}
         <div class="px-6 py-6">

@@ -30,8 +30,7 @@
                 <a href="{{ route('education.show', $item['id']) }}" class="bg-gray-50 rounded-xl shadow-sm overflow-hidden border border-gray-100 active:scale-95 transition transform">
                     {{-- Gambar (Placeholder kalau user belum ganti) --}}
                     <div class="h-32 w-full bg-blue-100 flex items-center justify-center overflow-hidden">
-                        <img src="{{ $item['image'] }}" alt="{{ $item['title'] }}" class="w-full h-full object-cover">
-                    </div>
+                        <img src="{{ asset($item['image']) }}" alt="{{ $item['title'] }}" class="w-full h-full object-cover">                    </div>
                     {{-- Judul --}}
                     <div class="p-3">
                         <h3 class="font-bold text-gray-800 text-sm leading-snug">{{ $item['title'] }}</h3>
