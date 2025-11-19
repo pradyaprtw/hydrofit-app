@@ -10,11 +10,11 @@ class DailyIntake extends Model
     use HasFactory;
 
     // Izinkan kolom ini diisi
-    protected $fillable = [
-        'user_id',
-        'user_name',
-        'date',
-        'total_glasses',
-        'total_ml',
+    protected $guarded = [
+        // 'user_id',
+        // 'user_name',
+        // 'date',
+        // 'total_glasses',
+        // 'total_ml',
     ];
 }
