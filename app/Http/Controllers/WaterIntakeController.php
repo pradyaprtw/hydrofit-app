@@ -114,6 +114,8 @@ class WaterIntakeController extends Controller
 
         return view('progress', compact('weeklyData'));
     }
+
+
     
     // [6] Tampilkan Halaman About
     public function about()

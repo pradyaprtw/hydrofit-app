@@ -18,9 +18,10 @@
         <div class="px-6 flex flex-col items-center text-center">
             
             {{-- Gambar Bulat --}}
-            <div class="w-32 h-32 rounded-full overflow-hidden border-4 border-blue-100 mb-6 shadow-sm">
-                {{-- Ganti asset('asset/air.jpg') dengan gambar gelasmu --}}
-                <img src="{{ asset('asset/air.jpg') }}" class="w-full h-full object-cover">
+            <div class="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-10 h-10 text-[#40B7D5]" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
+                </svg>
             </div>
 
             {{-- Judul --}}
