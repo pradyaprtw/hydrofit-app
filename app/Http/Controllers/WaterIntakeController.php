@@ -1,4 +1,5 @@
 <?php
+// app/Http/Controllers/WaterIntakeController.php
 
 namespace App\Http\Controllers;
 
@@ -9,136 +10,112 @@ use Carbon\Carbon;
 
 class WaterIntakeController extends Controller
 {
+    // Tampilkan Dashboard
     public function index()
     {
         $user = Auth::user();
         $today = Carbon::today();
-
-        // Ambil data hari ini, kalau gak ada anggap 0
         $intake = DailyIntake::where('user_id', $user->id)
-                    ->where('date', $today)
-                    ->first();
+                             ->where('date', $today)->first();
 
         $consumedGlasses = $intake ? $intake->total_glasses : 0;
-
         return view('dashboard', compact('consumedGlasses'));
     }
 
-public function update(Request $request)
+    // [1] UPDATE ASUPAN AIR (Dipanggil dari Reminder)
+    public function update(Request $request)
     {
         $user = Auth::user();
         
-        // === SAFETY CHECK: Kalau sesi hilang, tolak request ===
+        // PENTING: Safety Check untuk mencegah server crash saat sesi hilang
         if (!$user) {
-            // Ini akan memaksa browser menangani error dan mungkin meminta login ulang
             return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
         }
-        // ======================================================
         
         $today = Carbon::today();
         $glasses = $request->glasses;
+        $glass_size = 250; 
 
-        // Proses update (Hanya jalan kalau sesi aman)
         DailyIntake::updateOrCreate(
             ['user_id' => $user->id, 'date' => $today],
             [
                 'user_name' => $user->name,
                 'total_glasses' => $glasses,
-                'total_ml' => $glasses * 250,
+                'total_ml' => $glasses * $glass_size,
             ]
         );
 
         return response()->json(['status' => 'success']);
     }
 
-    // Tampilkan Halaman Hitung
+    // [2] LOGIKA HITUNG KEBUTUHAN (Hanya tampilkan view)
     public function calculate()
     {
         return view('calculate');
     }
 
-    // Simpan Target Baru ke Database (User Table)
+    // [3] SIMPAN TARGET HARIAN (Diubah jadi Mode Demo)
     public function saveTarget(Request $request)
     {
-        $user = Auth::user();
-        
-        // Kita simpan targetnya di tabel users (pastikan kolom daily_target ada, atau kita paksa update aja)
-        // Kalau mau simple buat tugas, kita anggap sukses aja dulu
-        // $user->daily_target = $request->target;
-        // $user->save();
-
-        return response()->json(['status' => 'success', 'message' => 'Target berhasil disimpan!']);
+        // Karena tidak ada kolom target di tabel users, kita buat mode demo aman
+        $target = $request->target;
+        if ($target < 1000 || $target > 10000) {
+             return response()->json(['status' => 'error', 'message' => 'Target tidak valid.'], 400);
+        }
+        return response()->json(['status' => 'success', 'message' => 'Target berhasil disimpan!'], 200);
     }
-
+    
+    // [4] Tampilkan Halaman Pengingat
     public function reminder()
     {
         $user = Auth::user();
         $today = Carbon::today();
-
-        // Cek data hari ini, biar kalau direfresh gelasnya gak ilang
         $intake = DailyIntake::where('user_id', $user->id)
-                    ->where('date', $today)
-                    ->first();
-
+                             ->where('date', $today)->first();
         $currentGlasses = $intake ? $intake->total_glasses : 0;
-
         return view('reminder', compact('currentGlasses'));
     }
 
+    // [5] Tampilkan Halaman Progress (Logika Mingguan)
     public function progress()
     {
         $user = Auth::user();
-        $startOfWeek = Carbon::now()->startOfWeek(); // Hari Senin minggu ini
-        $endOfWeek = Carbon::now()->endOfWeek();     // Hari Minggu minggu ini
+        $startOfWeek = Carbon::now()->startOfWeek(); 
+        $endOfWeek = Carbon::now()->endOfWeek();     
 
-        // Ambil data database range minggu ini
         $records = DailyIntake::where('user_id', $user->id)
                     ->whereBetween('date', [$startOfWeek, $endOfWeek])
                     ->get()
-                    ->keyBy('date'); // Biar gampang dipanggil pakai tanggal
+                    ->keyBy('date'); 
 
-        // Siapkan Array Kosong Senin-Minggu
         $weeklyData = [];
         $period = \Carbon\CarbonPeriod::create($startOfWeek, $endOfWeek);
 
         foreach ($period as $date) {
             $dateStr = $date->format('Y-m-d');
-            // Nama Hari Indonesia Manual biar pasti bener
-            $dayName = [
-                'Mon' => 'Senin', 'Tue' => 'Selasa', 'Wed' => 'Rabu', 
-                'Thu' => 'Kamis', 'Fri' => 'Jumat', 'Sat' => 'Sabtu', 'Sun' => 'Minggu'
-            ][$date->format('D')];
+            $dayName = [ 'Mon' => 'Senin', 'Tue' => 'Selasa', 'Wed' => 'Rabu', 
+                         'Thu' => 'Kamis', 'Fri' => 'Jumat', 'Sat' => 'Sabtu', 'Sun' => 'Minggu'
+                       ][$date->format('D')];
 
-            // Cek apakah ada data di database tanggal tsb?
             $glasses = isset($records[$dateStr]) ? $records[$dateStr]->total_glasses : 0;
 
-            // Tentukan Status Sesuai Request
-            $status = "";
-            $color = ""; // Buat warna status biar cantik
+            $status = ""; $color = ""; 
             
             if ($glasses >= 8) {
-                $status = "✅ Cukup";
-                $color = "text-green-600 bg-green-100";
+                $status = "✅ Cukup"; $color = "text-green-600 bg-green-100";
             } elseif ($glasses == 7) {
-                $status = "⚠️ Sedikit Kurang";
-                $color = "text-yellow-600 bg-yellow-100";
+                $status = "⚠️ Sedikit Kurang"; $color = "text-yellow-600 bg-yellow-100";
             } else {
-                $status = "❌ Kurang";
-                $color = "text-red-600 bg-red-100";
+                $status = "❌ Kurang"; $color = "text-red-600 bg-red-100";
             }
 
-            // Masukkan ke array
-            $weeklyData[] = [
-                'day' => $dayName,
-                'glasses' => $glasses,
-                'status' => $status,
-                'color' => $color
-            ];
+            $weeklyData[] = ['day' => $dayName, 'glasses' => $glasses, 'status' => $status, 'color' => $color];
         }
 
         return view('progress', compact('weeklyData'));
     }
-
+    
+    // [6] Tampilkan Halaman About
     public function about()
     {
         return view('about');

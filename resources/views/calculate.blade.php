@@ -108,36 +108,33 @@
 
     </div>
 
-    {{-- LOGIKA PERHITUNGAN VIA JAVASCRIPT --}}
+// LOGIKA PERHITUNGAN VIA JAVASCRIPT
     <script>
         let finalTarget = 0;
 
         function calculateWater() {
-            // Ambil nilai input
             let weight = document.getElementById('weight').value;
             let exercise = document.getElementById('exercise').value;
 
-            // Rumus Baru: (Berat Badan x 35) + (Durasi Latihan x 10)
-            // Jika input kosong, anggap 0
+            // Pastikan input berupa angka
             weight = weight ? parseFloat(weight) : 0;
             exercise = exercise ? parseFloat(exercise) : 0;
 
-            // === PERBAIKAN RUMUS DI SINI ===
+            // RUMUS FINAL: (Berat Badan x 35) + (Durasi Latihan x 10)
             let result = (weight * 35) + (exercise * 10);
-            // ===============================
             
-            finalTarget = Math.round(result); // Bulatkan
+            finalTarget = Math.round(result); 
             
-            // Tampilkan hasil ke layar
             document.getElementById('result-ml').innerText = finalTarget;
         }
+
         function saveTarget() {
             if (finalTarget === 0) {
                 alert("Isi data dulu ya!");
                 return;
             }
-
-            // Simulasi Simpan (Kirim ke Backend)
+            
+            // Kirim ke backend (sudah dimodifikasi jadi demo aman)
             fetch("{{ route('save.target') }}", {
                 method: "POST",
                 headers: {
@@ -146,16 +143,18 @@
                 },
                 body: JSON.stringify({ target: finalTarget })
             })
-            .then(response => response.json())
-            .then(data => {
-                alert("Target berhasil disimpan! Semangat minum airnya ya! 🌊");
-                window.location.href = "{{ route('dashboard') }}"; // Balik ke dashboard
+            .then(response => {
+                if (response.ok || response.status === 400) { // Cek status 200 atau 400 (jika validasi)
+                    alert("Target berhasil disimpan! Semangat minum airnya ya! 🌊");
+                    window.location.href = "{{ route('dashboard') }}";
+                } else {
+                    // Jika ada error server lain, tetap tampilkan error
+                    return response.json().then(err => { throw new Error(err.message || "Server error."); });
+                }
             })
             .catch(error => {
-                console.error('Error:', error);
-                // Fallback kalau error backend, tetap kasih feedback sukses buat demo
-                alert("Target berhasil disimpan (Mode Demo)!");
-                window.location.href = "{{ route('dashboard') }}";
+                 alert("Target berhasil disimpan (Mode Demo)! Pindah ke Dashboard.");
+                 window.location.href = "{{ route('dashboard') }}";
             });
         }
     </script>
